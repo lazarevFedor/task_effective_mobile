@@ -2,78 +2,18 @@ package logger
 
 import (
 	"context"
-	"fmt"
-
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
+	"log/slog"
 )
 
-const (
-	RequestID = "request_id"
-	Key       = "Logger"
-)
+type key string
 
-type Logger struct {
-	l *zap.Logger
+const loggerKey = key("logger")
+
+func WithLogger(ctx context.Context, logger *slog.Logger) context.Context {
+	return context.WithValue(ctx, loggerKey, logger)
 }
 
-func NewLoggerContext(ctx context.Context, dev bool) (context.Context, error) {
-	var config zap.Config
-	if dev {
-		config = zap.NewDevelopmentConfig()
-		config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
-	} else {
-		config = zap.NewProductionConfig()
-		config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
-	}
-
-	logger, err := config.Build()
-	if err != nil {
-		return nil, fmt.Errorf("NewLogger: %w", err)
-	}
-
-	ctx = context.WithValue(ctx, Key, &Logger{logger})
-	return ctx, nil
-}
-
-func GetLoggerFromCtx(ctx context.Context) *Logger {
-	return ctx.Value(Key).(*Logger)
-}
-
-func NewContextWithLogger(ctx context.Context, log *Logger) context.Context {
-	ctx = context.WithValue(ctx, Key, log)
-	return ctx
-}
-
-func WithRequestID(ctx context.Context, request_id string) context.Context {
-	ctx = context.WithValue(ctx, RequestID, request_id)
-	return ctx
-}
-
-func (l *Logger) Info(ctx context.Context, msg string, fields ...zap.Field) {
-	if ctx.Value(RequestID) != nil {
-		fields = append(fields, zap.String(RequestID, ctx.Value(RequestID).(string)))
-	}
-	l.l.Info(msg, fields...)
-}
-
-func (l *Logger) Warn(ctx context.Context, msg string, fields ...zap.Field) {
-	if ctx.Value(RequestID) != nil {
-		fields = append(fields, zap.String(RequestID, ctx.Value(RequestID).(string)))
-	}
-	l.l.Warn(msg, fields...)
-}
-
-func (l *Logger) Error(ctx context.Context, msg string, fields ...zap.Field) {
-	if ctx.Value(RequestID) != nil {
-		fields = append(fields, zap.String(RequestID, ctx.Value(RequestID).(string)))
-	}
-	l.l.Error(msg, fields...)
-}
-
-func (l *Logger) Debug(ctx context.Context, msg string, fields ...zap.Field) {
-	if ctx.Value(RequestID) != nil {
-		fields = append(fields, zap.String(RequestID, ctx.Value(RequestID).(string)))
-	}
-	l.l.Debug(msg, fields...)
+func GetLogger(ctx context.Context) *slog.Logger {
+	logger := ctx.Value(loggerKey)
+	return logger.(*slog.Logger)
 }

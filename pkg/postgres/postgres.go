@@ -25,7 +25,7 @@ type Config struct {
 
 // New returns pool of connections to postgres DB
 func New(ctx context.Context, c Config, service string) (*pgxpool.Pool, error) {
-	log := logger.GetLoggerFromCtx(ctx)
+	log := logger.GetLogger(ctx)
 	connString := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable&pool_min_conns=%d&pool_max_conns=%d",
 		c.Username,
 		c.Password,
@@ -38,7 +38,7 @@ func New(ctx context.Context, c Config, service string) (*pgxpool.Pool, error) {
 	if err != nil {
 		return nil, fmt.Errorf("new: failed to connect to postgres: %w", err)
 	}
-	log.Info(ctx, fmt.Sprintf("connected to %s_postgres", service))
+	log.Info(fmt.Sprintf("connected to %s_postgres", service))
 
 	migration, err := migrate.New(
 		fmt.Sprintf("file://db/migrations/%s", service),
@@ -58,6 +58,6 @@ func New(ctx context.Context, c Config, service string) (*pgxpool.Pool, error) {
 	if err := migration.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
 		return nil, fmt.Errorf("new: failed to Up migration: %w", err)
 	}
-	log.Info(ctx, "Successfully Applied Migration")
+	log.Info("Successfully Applied Migration")
 	return conn, nil
 }
