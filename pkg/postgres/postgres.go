@@ -1,3 +1,6 @@
+// Package postgres provides a small helper for creating a pgx connection
+// pool from environment-driven configuration. It also contains the Config
+// struct used to populate connection settings via environment variables.
 package postgres
 
 import (
@@ -10,6 +13,11 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+// Config describes connection parameters for a Postgres instance.
+//
+// The fields are tagged for mapping from environment variables (e.g.
+// POSTGRES_HOST, POSTGRES_PORT, POSTGRES_USER, POSTGRES_PASSWORD,
+// POSTGRES_DB) by the application's configuration loader.
 type Config struct {
 	Host     string `env:"POSTGRES_HOST"`
 	Port     string `env:"POSTGRES_PORT"`
@@ -21,7 +29,11 @@ type Config struct {
 	MaxConns int32 `env:"POSTGRES_MAX_CONNS"`
 }
 
-// New returns pool of connections to postgres DB
+// New creates and returns a pgx connection pool configured according to c.
+//
+// The provided context is used for pool creation and the service parameter
+// is used for logging context only. Returned pool should be closed by the
+// caller when no longer needed.
 func New(ctx context.Context, c Config, service string) (*pgxpool.Pool, error) {
 	log := logger.GetLogger(ctx)
 	connString := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable&pool_min_conns=%d&pool_max_conns=%d",

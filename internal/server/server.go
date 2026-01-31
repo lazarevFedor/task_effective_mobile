@@ -1,3 +1,9 @@
+// Package server exposes HTTP handlers and wiring for the subscriptions
+// service. It registers routes for creating, listing, retrieving, updating,
+// deleting subscriptions and calculating aggregated values (total cost).
+//
+// The package also contains swagger annotations used by swag to generate API
+// documentation.
 package server
 
 import (
@@ -40,6 +46,9 @@ func createSubscriptionsDoc() {}
 // @Router /subscriptions [get]
 func listSubscriptionsDoc() {}
 
+// subscriptionsHandler returns an http.HandlerFunc that handles requests to
+// the /subscriptions endpoint. It supports POST for creating a subscription
+// and GET for listing all subscriptions.
 func subscriptionsHandler(ctx context.Context, repo *repositories.SubscriptionsRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log := logger.GetLogger(ctx)
@@ -211,6 +220,10 @@ func subscriptionsTotalHandler(ctx context.Context, repo *repositories.Subscript
 	}
 }
 
+// subscriptionsIDHandler returns an http.HandlerFunc that handles GET, PUT
+// and DELETE for the /subscriptions/{id} endpoint. It supports retrieving
+// a single subscription, performing partial updates, and deleting the
+// subscription by id.
 func subscriptionsIDHandler(ctx context.Context, repo *repositories.SubscriptionsRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log := logger.GetLogger(ctx)
@@ -313,6 +326,11 @@ func subscriptionsIDHandler(ctx context.Context, repo *repositories.Subscription
 	}
 }
 
+// Start initializes the server routing and starts the HTTP server.
+//
+// It reads configuration using the internal config package, creates a
+// SubscriptionsRepository and registers handlers on a new ServeMux. The
+// function blocks until the HTTP server exits or returns an error.
 func Start(ctx context.Context) error {
 	log := logger.GetLogger(ctx)
 	mux := http.NewServeMux()
