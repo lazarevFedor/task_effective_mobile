@@ -28,11 +28,11 @@ make stop
 - В проекте имеются SQL-миграции в `internal/migrations`. Их можно применить с помощью утилиты `migrate`:
 ```bash
 make up
+```
 - Аналогично для отката:
 ```bash
 make down
 ```
-- В Docker Compose может быть автоматическое применение миграций в зависимости от конфигурации — проверьте `deployments/docker-compose.yml`.
 
 4) Swagger
 - Для генерации swagger-спецификации выполните в терминале:
