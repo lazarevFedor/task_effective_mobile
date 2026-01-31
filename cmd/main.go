@@ -10,5 +10,8 @@ import (
 
 func main() {
 	ctx := logger.WithLogger(context.Background(), slog.New(slog.NewJSONHandler(os.Stdout, nil)))
-	_ = server.Start(ctx)
+	if err := server.Start(ctx); err != nil {
+		logger.GetLogger(ctx).Error("server exited with error", "err", err)
+		os.Exit(1)
+	}
 }
