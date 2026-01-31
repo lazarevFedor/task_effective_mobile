@@ -2,11 +2,9 @@ package postgres
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"task_effective_mobile/pkg/logger"
 
-	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -38,26 +36,6 @@ func New(ctx context.Context, c Config, service string) (*pgxpool.Pool, error) {
 	if err != nil {
 		return nil, fmt.Errorf("new: failed to connect to postgres: %w", err)
 	}
-	log.Info(fmt.Sprintf("connected to %s_postgres", service))
-
-	migration, err := migrate.New(
-		fmt.Sprintf("file://db/migrations/%s", service),
-		fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
-			c.Username,
-			c.Password,
-			c.Host,
-			c.Port,
-			c.Database,
-		),
-	)
-
-	if err != nil {
-		return nil, fmt.Errorf("new: failed to create migration instance: %w", err)
-	}
-
-	if err := migration.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
-		return nil, fmt.Errorf("new: failed to Up migration: %w", err)
-	}
-	log.Info("Successfully Applied Migration")
+	log.Info(fmt.Sprintf("connected to %s", service))
 	return conn, nil
 }
