@@ -1,0 +1,192 @@
+basePath: /
+host: localhost:8080
+info:
+  contact: {}
+  description: API for managing user subscriptions.
+  title: Subscriptions API
+  version: "1.0"
+paths:
+  /subscriptions:
+    get:
+      description: Get list of subscriptions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: object
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: List subscriptions
+      tags:
+      - subscriptions
+    post:
+      consumes:
+      - application/json
+      description: Create a new subscription
+      parameters:
+      - description: Subscription to create
+        in: body
+        name: subscription
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: integer
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Create subscription
+      tags:
+      - subscriptions
+  /subscriptions/{id}:
+    delete:
+      description: Delete subscription
+      parameters:
+      - description: Subscription ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Delete subscription by id
+      tags:
+      - subscriptions
+    get:
+      description: Get subscription by id
+      parameters:
+      - description: Subscription ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get subscription by id
+      tags:
+      - subscriptions
+    put:
+      consumes:
+      - application/json
+      description: Update subscription fields partially
+      parameters:
+      - description: Subscription ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Fields to update
+        in: body
+        name: subscription
+        required: true
+        schema:
+          type: object
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Update subscription by id
+      tags:
+      - subscriptions
+  /subscriptions/total:
+    get:
+      description: 'Calculate total sum of subscription prices for the given filters
+        and period (optional filters: user_id, service_name, start_date, end_date
+        in MM-YYYY)'
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        type: string
+      - description: Service name
+        in: query
+        name: service_name
+        type: string
+      - description: Period start in MM-YYYY
+        in: query
+        name: start_date
+        type: string
+      - description: Period end in MM-YYYY
+        in: query
+        name: end_date
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: integer
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get total cost
+      tags:
+      - subscriptions
+swagger: "2.0"
