@@ -9,3 +9,6 @@ up:
 
 down:
 	migrate -database 'postgres://user:1234@localhost:5432/subscriptions_db?sslmode=disable' -path internal/migrations down
+
+swagger:
+	swag init -g internal/server/server.go -o api
